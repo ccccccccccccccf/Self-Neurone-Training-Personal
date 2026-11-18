@@ -20,7 +20,7 @@ if mode==0:
     testy=[[1.],[3.],[2.],[5.],[4.]]
     d1= torch.tensor(testx,dtype=torch.float32, requires_grad=False)
     d2= torch.tensor(testy,dtype=torch.float32, requires_grad=False)
-    maxx=abs(d1).max()
+    maxx=abs(d1).max().item()
     d1=d1/maxx
     x2=torch.cat([d1**5,d1**4,d1**3,d1**2,d1**1], dim=1)
     w=torch.tensor([[1.],[1.],[1.],[1.],[1.]], dtype=torch.float32, requires_grad=True)
@@ -41,17 +41,19 @@ if mode==0:
         xx.append(i)
         yy.append(float(f"{loss1.item():.10f}"))
     print("Expected function")
-    fx=(f"{w[0][0]/(maxx**5)}x^5+{w[1][0]/(maxx**4)}x^4+{w[2][0]/(maxx**3)}x^3+{w[3][0]/(maxx**2)}x^2+{w[4][0]/maxx}x+{b}")
+    fx=(f"{w[0][0]/(maxx**5)}x^5+{w[1][0]/(maxx**4)}x^4\n+{w[2][0]/(maxx**3)}x^3+{w[3][0]/(maxx**2)}x^2\n+{w[4][0]/maxx}x+{b}")
     print(fx)
-    anyx = np.linspace(-5, 5, 400)
+    anyx = [xi/40 for xi in range(0,401)]
+  
     print(anyx)
-    fanyx = (w[0][0]/(maxx**5))*anyx**5+(w[1][0]/(maxx**4))*anyx**4+(w[2][0]/(maxx**3))*anyx**3+(w[3][0]/(maxx**2))*anyx**2+(w[4][0]/maxx)*anyx+b
-    plt.plot(anyx, fanyx, label=f"f(x) = {fx}")
-    pointlist=[]
-    for a in range(len(testx)):
-        pointlist.append((testx[a][0], testy[a][0]))
-    plt.scatter(*pointlist, color='red', zorder=100, label='test')
-    plt.title(fx)
+    f = lambda xj: (w[0][0].item()/(maxx**5))*xj**5+(w[1][0].item()/(maxx**4))*xj**4+(w[2][0].item()/(maxx**3))*xj**3+(w[3][0].item()/(maxx**2))*xj**2+(w[4][0].item()/maxx)*xj+b.item()
+    fanyx= [f(aa) for aa in anyx]
+    plt.figure(1)
+    plt.plot(anyx, fanyx, label=f"")
+    px=[testx[aaa1][0] for aaa1 in range(len(testx))]
+    py =[testy[aaa2][0] for aaa2 in range(len(testy))]
+    plt.scatter(px, py, color='red', zorder=100, label='test')
+    plt.title(fx, fontsize=16, wrap=True, family='unifont')
     plt.xlabel("x")
     plt.ylabel("y")
     plt.legend()
@@ -105,6 +107,7 @@ if mode==1:
     #print(d1)
 def train(y, times=100):
     pass
+plt.figure(2)
 plt.plot(xx,yy,linestyle='-', label='loss1', color='blue')
 #plt.plot(xx,yw,linestyle='-', label='w grad', color='red')
 #plt.plot(xx,yb,linestyle='-', label='b grad', color='green')
@@ -114,4 +117,6 @@ plt.ylabel("Loss1")
 plt.title("test")
 plt.legend()
 plt.grid(True)
+if mode == 0:
+    plt.figure(1)
 plt.show()
