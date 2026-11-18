@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
+import pandas as pd
 #from torchvision import datasets, transforms
 #from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
@@ -17,7 +18,7 @@ while True:
     
 if mode==0:
     testx=[[1.],[3.],[5.],[7.],[9.]]
-    testy=[[1.],[3.],[2.],[5.],[4.]]
+    testy=[[1.],[2.],[2.],[4.],[5.]]
     d1= torch.tensor(testx,dtype=torch.float32, requires_grad=False)
     d2= torch.tensor(testy,dtype=torch.float32, requires_grad=False)
     maxx=abs(d1).max().item()
@@ -26,9 +27,9 @@ if mode==0:
     w=torch.tensor([[1.],[1.],[1.],[1.],[1.]], dtype=torch.float32, requires_grad=True)
     b=torch.tensor(0., dtype=torch.float32, requires_grad=True)
 
-    mlp=nn.Sequential(nn.Linear(5,10),nn.ReLU(),nn.Linear(10,1))
+
 #mlp.parameters()
-    opt = torch.optim.AdamW([w,b], lr=0.05)
+    opt = torch.optim.SGD([w,b], lr=0.05)
     xx=[]
     yy=[]
     for i in range(1001):
@@ -54,69 +55,109 @@ if mode==0:
     py =[testy[aaa2][0] for aaa2 in range(len(testy))]
     plt.scatter(px, py, color='red', zorder=100, label='test')
     plt.title(fx, fontsize=16, wrap=True, family='unifont')
-    plt.xlabel("x")
+    #plt.xlabel("x")
     plt.ylabel("y")
     plt.legend()
     plt.grid(True)
-if mode==1:
+    main()
+# if mode==1:
     
-    data1=torch.tensor([[0.,0.],[0.,1.],[1.,0.],[1.,1.]], dtype=torch.float32)
-    AND = torch.tensor([0.,0.,0.,1.])
-    XOR = torch.tensor([0.,1.,1.,0.])
+#     data1=torch.tensor([[0.,0.],[0.,1.],[1.,0.],[1.,1.]], dtype=torch.float32)
+#     AND = torch.tensor([0.,0.,0.,1.])
+#     XOR = torch.tensor([0.,1.,1.,0.])
 
 
-    print(data1, w)
-    print(data1@w)
+#     print(data1, w)
+#     print(data1@w)
 
-    #x1=torch.cat([d1,d1,d1,d1],dim=1)
-    #x2=torch.cat([d1**1,d1**2, d1**3, d1**4], dim=1)
+#     #x1=torch.cat([d1,d1,d1,d1],dim=1)
+#     #x2=torch.cat([d1**1,d1**2, d1**3, d1**4], dim=1)
 
-    #print(x2)
+#     #print(x2)
 
-    w=torch.tensor([1.,0.], dtype=torch.float32, requires_grad=True)
-    #w1=torch.tensor(-1., dtype=torch.float32, requires_grad=True)
-    b=torch.tensor(0., dtype=torch.float32, requires_grad=True)
-    #b1=torch.tensor(5., dtype=torch.float32, requires_grad=True)
-    print(data1, w)
-    print(data1@w)
-    xx=[]
-    yy=[]
-    yw=[]
-    yb=[]
-    mlp=nn.Sequential(nn.Linear(5,10),nn.ReLU(),nn.Linear(10,1))
-    #mlp.parameters()
-    opt = torch.optim.AdamW([w,b], lr=0.05)
-    for i in range(1001):
-        #loss1=(torch.matmul(x2,w)+b-d2).pow(2).sum()
-        #loss1=(data1@w+b-d2).pow(2).sum()
-        loss1 = F.binary_cross_entropy_with_logits(data1@w+b, AND)
-        loss1.backward()
-        #print(f"權重梯度: {w.grad}")
-        #print(f"偏置梯度: {b.grad}")
-        #yw.append(w.grad)
-        #yb.append(b.grad)
-        opt.step()
-        opt.zero_grad()
-        print(f"\n--- 第 {i} 輪訓練後 ---")
-        print(f"當前錯誤率 (Loss): {loss1.item():.10f}")
-        xx.append(i)
-        yy.append(float(f"{loss1.item():.10f}"))
+#     w=torch.tensor([1.,0.], dtype=torch.float32, requires_grad=True)
+#     #w1=torch.tensor(-1., dtype=torch.float32, requires_grad=True)
+#     b=torch.tensor(0., dtype=torch.float32, requires_grad=True)
+#     #b1=torch.tensor(5., dtype=torch.float32, requires_grad=True)
+#     print(data1, w)
+#     print(data1@w)
+#     xx=[]
+#     yy=[]
+#     yw=[]
+#     yb=[]
+#     mlp=nn.Sequential(nn.Linear(5,10),nn.ReLU(),nn.Linear(10,1))
+#     #mlp.parameters()
+#     opt = torch.optim.AdamW([w,b], lr=0.05)
+#     for i in range(1001):
+#         #loss1=(torch.matmul(x2,w)+b-d2).pow(2).sum()
+#         #loss1=(data1@w+b-d2).pow(2).sum()
+#         loss1 = F.binary_cross_entropy_with_logits(data1@w+b, AND)
+#         loss1.backward()
+#         #print(f"權重梯度: {w.grad}")
+#         #print(f"偏置梯度: {b.grad}")
+#         #yw.append(w.grad)
+#         #yb.append(b.grad)
+#         opt.step()
+#         opt.zero_grad()
+#         print(f"\n--- 第 {i} 輪訓練後 ---")
+#         print(f"當前錯誤率 (Loss): {loss1.item():.10f}")
+#         xx.append(i)
+#         yy.append(float(f"{loss1.item():.10f}"))
     #print(f"{ b.item()}+{w[0][0].item()/maxx}*x+{w[1][0].item()/(maxx**2)}*x^2+{w[2][0].item()/(maxx**3)}*x^3+{w[3][0].item()/(maxx**4)}*x^4")
     
     #print(opt)
     #print(d1)
+if mode == 1:
+    csvdata=pd.read_csv("ai_generated_data_to_test.csv")
+    # print(list(csvdata.columns))
+    # print(csvdata.iloc[:,[0,1,2,3,4,6]])
+    presetdata=csvdata.iloc[:,[0,1,2,3,4]].values
+    outputdata=csvdata.iloc[:,5].values.reshape(-1, 1)
+    print(outputdata)
+    print(presetdata)
+    print(outputdata)
+    # print(csvdata.values, "\n\n")
+    # print(csvdata.iloc[1:3],"\n\n")
+    # print(csvdata.iloc[1:3,0],"\n\n")
+    # print(csvdata.iloc[1:3,1],"\n\n")
+    # print(csvdata.iloc[2],"\n\n")
+    # print(csvdata.iloc[0:2],"\n\n")
+    # print(csvdata.iloc[1:5])
+    mlp1=nn.Sequential(nn.Linear(5,32),nn.GELU(),nn.Linear(32,16),nn.GELU(),nn.Linear(16,6),nn.GELU(),nn.Linear(6,1))
+    csvdatadata=torch.tensor(presetdata, dtype=torch.float32)/100
+    csvdataoutput=torch.tensor(outputdata, dtype=torch.float32)/100
+    optcsv1=torch.optim.SGD(mlp1.parameters(), lr=0.0022, momentum=0.9)
+    for i in range(2001):
+        losscsv1=(mlp1(csvdatadata)-csvdataoutput).pow(2).mean()
+        losscsv1.backward()
+        optcsv1.step()
+        optcsv1.zero_grad()
+        if i%200==0:
+            print(f"{i} th, loss:{losscsv1}")
+    inq="abcdef"
+    while True:
+        try:
+            inq=[float(input(f"{k}?")) for k in ["STR", "AGI", "INT", "STA", "LUCK"]]
+            inqtensor=torch.tensor(inq, dtype=torch.float32)/100
+        except ValueError:
+            print("passed")
+            continue
+        print(f"{mlp1(inqtensor).item()*100:.3f}")
+    
+    
 def train(y, times=100):
     pass
-plt.figure(2)
-plt.plot(xx,yy,linestyle='-', label='loss1', color='blue')
-#plt.plot(xx,yw,linestyle='-', label='w grad', color='red')
-#plt.plot(xx,yb,linestyle='-', label='b grad', color='green')
+def main():
+    plt.figure(2)
+    plt.plot(xx,yy,linestyle='-', label='loss1', color='blue')
+    #plt.plot(xx,yw,linestyle='-', label='w grad', color='red')
+    #plt.plot(xx,yb,linestyle='-', label='b grad', color='green')
 
-plt.xlabel("Number of opt trial")
-plt.ylabel("Loss1")
-plt.title("test")
-plt.legend()
-plt.grid(True)
-if mode == 0:
-    plt.figure(1)
-plt.show()
+    plt.xlabel("Number of opt trial")
+    plt.ylabel("Loss1")
+    plt.title("test")
+    plt.legend()
+    plt.grid(True)
+    if mode == 0:
+        plt.figure(1)
+    plt.show()
